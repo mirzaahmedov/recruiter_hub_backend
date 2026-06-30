@@ -6,24 +6,34 @@
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+generator frontend_types {
+  provider    = "prisma-client"
+  engineType  = "client"
+  output      = "../../frontend/src/types/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id    Int     @default(autoincrement()) @id
-  email String  @unique
-  name  String?
-  posts Post[]
+enum UserRole {
+  CANDIDATE
+  RECRUITER
+  ADMINISTRATOR
 }
 
-model Post {
-  id        Int      @default(autoincrement()) @id
-  title     String
-  content   String?
-  published Boolean? @default(false)
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  googleId  String?  @unique
+  role UserRole
+
+  createdAt DateTime @default(now())
+
+  @@map("users")
 }
